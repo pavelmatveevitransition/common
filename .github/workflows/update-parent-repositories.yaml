@@ -22,13 +22,14 @@ jobs:
 
       - name: Configure Git for Private Repos
         run: |
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git config --global url."https://${{ secrets.ORG_ADMIN_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
       - name: Checkout Parent Repository
         uses: actions/checkout@v6
         with:
           repository: ${{ matrix.parent_repo }}
           ref: ${{ steps.branch_info.outputs.target_branch }}
+          token: ${{ secrets.ORG_ADMIN_TOKEN }}
           fetch-depth: 0
 
       - name: Update Submodule on Specific Branch
