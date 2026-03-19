@@ -1,0 +1,36 @@
+name: Update Parent Repositories
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-parent-repos:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        parent_repo:
+          - "pavelmatveevitransition/application"
+
+    steps:
+      - name: Determine Target Branch
+        id: branch_info
+        run: |
+          echo "target_branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+
+      - name: Checkout Parent Repository
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ matrix.parent_repo }}
+          ref: ${{ steps.branch_info.outputs.target_branch }}
+          fetch-depth: 0
+
+      - name: Update Submodule on Specific Branch
+        run: |
+          TARGET_BRANCH="${{ steps.branch_info.outputs.target_branch }}"
+          echo "Updating submodule for branch: $TARGET_BRANCH"
+          
+          # 1. Initialize submodules
+          git submodule update --init
