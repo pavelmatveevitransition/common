@@ -20,6 +20,10 @@ jobs:
         run: |
           echo "target_branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
 
+      - name: Configure Git for Private Repos
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+
       - name: Checkout Parent Repository
         uses: actions/checkout@v6
         with:
