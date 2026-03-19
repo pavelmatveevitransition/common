@@ -55,7 +55,6 @@ jobs:
           git config -f .gitmodules submodule.$SUB_PATH.branch $TARGET_BRANCH
           
           # 4. Sync and Update
-          git config -f .gitmodules submodule.$SUB_PATH.branch $TARGET_BRANCH
           git submodule sync
           git submodule update --remote --merge
 
