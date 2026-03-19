@@ -8,8 +8,10 @@ on:
 jobs:
   update-parent-repos:
     runs-on: ubuntu-latest
-    continue-on-error: true
+    # fail-fast: false ensures that if one parent repo fails, 
+    # the workflow continues to update the rest.
     strategy:
+      fail-fast: false
       matrix:
         parent_repo:
           - "pavelmatveevitransition/application"
@@ -56,7 +58,11 @@ jobs:
           echo "SUB_PATH=$SUB_PATH" >> $GITHUB_ENV
 
           # 4. Update the specific submodule
-          git submodule update --remote --merge --branch $TARGET_BRANCH $SUB_PATH
+          # This configures the update command to track the specific branch temporarily,
+          # without writing to .gitmodules.
+          git config submodule.$SUB_PATH.branch $TARGET_BRANCH
+          # Run update. It reads the branch from the local config.
+          git submodule update --remote --merge $SUB_PATH
 
       - name: Commit and Push
         run: |
