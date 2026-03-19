@@ -13,6 +13,7 @@ jobs:
       matrix:
         parent_repo:
           - "pavelmatveevitransition/application"
+          - "pavelmatveevitransition/application2"
 
     steps:
       - name: Determine Target Branch
@@ -51,22 +52,21 @@ jobs:
           
           echo "Found submodule at path: $SUB_PATH"
           
-          # 3. Explicitly set the submodule to track the target branch
-          git config -f .gitmodules submodule.$SUB_PATH.branch $TARGET_BRANCH
-          
-          # 4. Sync and Update
-          git submodule sync
-          git submodule update --remote --merge
+          # 3. Save SUB_PATH to environment
+          echo "SUB_PATH=$SUB_PATH" >> $GITHUB_ENV
+
+          # 4. Update the specific submodule
+          git submodule update --remote --merge --branch $TARGET_BRANCH $SUB_PATH
 
       - name: Commit and Push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "Changes detected, pushing to ${{ steps.branch_info.outputs.target_branch }}..."
-            git add .
-            git commit -m "Automated update common on ${{ steps.branch_info.outputs.target_branch }}"
+          if [ -n "$(git status --porcelain $SUB_PATH)" ]; then
+            echo "Changes detected in $SUB_PATH, pushing to ${{ steps.branch_info.outputs.target_branch }}..."
+            git add "$SUB_PATH"
+            git commit -m "Automated update $SUB_PATH on ${{ steps.branch_info.outputs.target_branch }}"
             git push origin ${{ steps.branch_info.outputs.target_branch }}
           else
             echo "No changes needed for ${{ matrix.parent_repo }} on this branch."
