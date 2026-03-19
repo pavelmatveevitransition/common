@@ -8,9 +8,8 @@ on:
 jobs:
   update-parent-repos:
     runs-on: ubuntu-latest
-    # fail-fast: false ensures that if one parent repo fails, 
-    # the workflow continues to update the rest.
     strategy:
+      # if one parent repo fails the workflow continues to update the rest.
       fail-fast: false
       matrix:
         parent_repo:
